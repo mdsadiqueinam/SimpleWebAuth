@@ -20,7 +20,7 @@ publishing {
         pom {
             name.set("Kotlin Multiplatform library template")
             description.set("Dummy library to test deployment to Maven Central")
-            url.set("https://github.com/Kotlin/multiplatform-library-template")
+            url.set("https://github.com/mdsadiqueinam/SimpleWebAuth")
 
             licenses {
                 license {
@@ -37,7 +37,7 @@ publishing {
                 }
             }
             scm {
-                url.set("https://github.com/Kotlin/multiplatform-library-template")
+                url.set("https://github.com/mdsadiqueinam/SimpleWebAuth")
             }
         }
     }
