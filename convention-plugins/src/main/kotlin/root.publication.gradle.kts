@@ -3,7 +3,7 @@ plugins {
 }
 
 allprojects {
-    group = "org.jetbrains.kotlinx.multiplatform-library-template"
+    group = "mdsadiqueinam.github.io.SimpleWebAuth"
     version = "0.0.1"
 }
 
