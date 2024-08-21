@@ -37,6 +37,7 @@ kotlin {
             }
         }
         nodejs()
+        binaries.executable()
     }
     js {
         browser {
@@ -48,6 +49,7 @@ kotlin {
             }
         }
         nodejs()
+        binaries.executable()
     }
 
     sourceSets {
