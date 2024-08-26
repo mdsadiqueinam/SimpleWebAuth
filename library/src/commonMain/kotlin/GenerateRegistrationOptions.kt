@@ -1,7 +1,7 @@
 @file:OptIn(ExperimentalUnsignedTypes::class)
 
-import extensions.asBase64URLString
-import extensions.asUByteArray
+import extensions.encodeToBase64URLString
+import extensions.encodeToUByteArray
 import kotlinx.serialization.Serializable
 import models.AttestationConveyancePreference
 import models.AuthenticationExtensionsClientInputs
@@ -54,16 +54,16 @@ class GenerateRegistrationOptionsOptsBuilder {
 
     var userID: UByteArray = Random.nextBytes(32).toUByteArray()
 
-    var base64UserID get(): String = userID.asBase64URLString()
+    var base64UserID get(): String = userID.encodeToBase64URLString()
         set(value) {
-            userID = value.asUByteArray()
+            userID = value.encodeToUByteArray()
         }
 
     var challenge: UByteArray = Random.nextBytes(32).toUByteArray()
 
-    var base64Challenge get(): String = challenge.asBase64URLString()
+    var base64Challenge get(): String = challenge.encodeToBase64URLString()
         set(value) {
-            challenge = value.asUByteArray()
+            challenge = value.encodeToUByteArray()
         }
 
     var userDisplayName: String = ""
@@ -107,13 +107,13 @@ inline fun generateRegistrationOptions(
 
 fun generateRegistrationOptions(options: GenerateRegistrationOptionsOpts): PublicKeyCredentialCreationOptions {
     return PublicKeyCredentialCreationOptions(
-        challenge = options.challenge.asBase64URLString(),
+        challenge = options.challenge.encodeToBase64URLString(),
         rp = PublicKeyCredentialRpEntity(
             id = options.rpId,
             name = options.rpName,
         ),
         user = PublicKeyCredentialUserEntity(
-            id = options.userID.asBase64URLString(),
+            id = options.userID.encodeToBase64URLString(),
             name = options.userName,
             displayName = options.userDisplayName,
         ),

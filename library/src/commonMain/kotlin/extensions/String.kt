@@ -4,7 +4,7 @@ import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 @OptIn(ExperimentalEncodingApi::class, ExperimentalUnsignedTypes::class)
-fun String.asUByteArray(): UByteArray {
+fun String.encodeToUByteArray(): UByteArray {
     try {
         // Convert from Base64URL to Base64
         val base64 = replace('-', '+').replace('_', '/')
