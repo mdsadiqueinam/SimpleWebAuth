@@ -22,3 +22,11 @@ val supportedCOSEAlgorithmIdentifiers: List<COSEAlgorithmIdentifier> = listOf(
     // RSASSA-PKCS1-v1_5 w/ SHA-1 (Deprecated; here for legacy support)
     -65535,
 )
+
+val defaultAuthenticatorSelection = AuthenticatorSelectionCriteria.create(
+    requireResidentKey = true,
+    residentKey = ResidentKeyRequirement.REQUIRED,
+    userVerification = UserVerificationRequirement.REQUIRED,
+)
+
+val defaultSupportedAlgorithmIDs: List<COSEAlgorithmIdentifier> = listOf(-8, -7, -257)
