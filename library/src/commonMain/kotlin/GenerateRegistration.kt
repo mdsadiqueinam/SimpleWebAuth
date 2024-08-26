@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalUnsignedTypes::class)
+
 import extensions.asBase64URLString
 import extensions.asIsoUByteArray
 import kotlinx.serialization.Serializable
@@ -6,19 +8,22 @@ import models.AuthenticationExtensionsClientInputs
 import models.AuthenticatorSelectionCriteria
 import models.COSEAlgorithmIdentifier
 import models.ExcludeCredential
+import models.PublicKeyCredentialCreationOptions
+import models.PublicKeyCredentialDescriptor
 import models.PublicKeyCredentialParameters
+import models.PublicKeyCredentialRpEntity
+import models.PublicKeyCredentialUserEntity
 import models.defaultAuthenticatorSelection
 import models.defaultSupportedAlgorithmIDs
 import models.supportedCOSEAlgorithmIdentifiers
 import kotlin.random.Random
 
 @Serializable
-@OptIn(ExperimentalUnsignedTypes::class)
 data class GenerateRegistrationOptionsOpts(
     val rpName: String,
     val rpId: String,
     val userName: String,
-    val userID: UByteArray,
+    val userID: UByteArray = Random.nextBytes(32).toUByteArray(),
     val challenge: UByteArray = Random.nextBytes(32).toUByteArray(),
     val userDisplayName: String = "",
     val timeout: Long = 60000,
@@ -38,7 +43,7 @@ data class GenerateRegistrationOptionsOpts(
     }
 }
 
-@OptIn(ExperimentalUnsignedTypes::class)
+
 class GenerateRegistrationOptionsOptsBuilder {
     var rpName: String = ""
 
@@ -94,11 +99,33 @@ class GenerateRegistrationOptionsOptsBuilder {
 
 fun generateRegistrationOptions(
     block: GenerateRegistrationOptionsOptsBuilder.() -> Unit
-): GenerateRegistrationOptionsOpts {
+): PublicKeyCredentialCreationOptions {
     val options = GenerateRegistrationOptionsOptsBuilder().apply(block).build()
     return generateRegistrationOptions(options)
 }
 
-fun generateRegistrationOptions(options: GenerateRegistrationOptionsOpts): GenerateRegistrationOptionsOpts {
-    return options
+fun generateRegistrationOptions(options: GenerateRegistrationOptionsOpts): PublicKeyCredentialCreationOptions {
+    return PublicKeyCredentialCreationOptions(
+        challenge = options.challenge.asBase64URLString(),
+        rp = PublicKeyCredentialRpEntity(
+            id = options.rpId,
+            name = options.rpName,
+        ),
+        user = PublicKeyCredentialUserEntity(
+            id = options.userID.asBase64URLString(),
+            name = options.userName,
+            displayName = options.userDisplayName,
+        ),
+        pubKeyCredParams = options.pubKeyCredParams,
+        timeout = options.timeout,
+        attestation = options.attestationType,
+        excludeCredentials = options.excludeCredentials.map {
+            PublicKeyCredentialDescriptor(
+                id = it.id,
+                transports = it.transports
+            )
+        },
+        extensions = options.extensions.copy(credProps = true),
+        authenticatorSelection = options.authenticatorSelection,
+    )
 }
