@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalUnsignedTypes::class, ExperimentalUnsignedTypes::class)
+@file:OptIn(ExperimentalUnsignedTypes::class)
 
 import extensions.asBase64URLString
 import extensions.asUByteArray
@@ -44,6 +44,7 @@ data class GenerateRegistrationOptionsOpts(
 }
 
 
+@OptIn(ExperimentalUnsignedTypes::class)
 class GenerateRegistrationOptionsOptsBuilder {
     var rpName: String = ""
 
@@ -97,7 +98,7 @@ class GenerateRegistrationOptionsOptsBuilder {
     }
 }
 
-fun generateRegistrationOptions(
+inline fun generateRegistrationOptions(
     block: GenerateRegistrationOptionsOptsBuilder.() -> Unit
 ): PublicKeyCredentialCreationOptions {
     val options = GenerateRegistrationOptionsOptsBuilder().apply(block).build()
