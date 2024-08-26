@@ -99,4 +99,6 @@ fun generateRegistrationOptions(
     return generateRegistrationOptions(options)
 }
 
-fun generateRegistrationOptions(options: GenerateRegistrationOptionsOpts): GenerateRegistrationOptionsOpts {}
+fun generateRegistrationOptions(options: GenerateRegistrationOptionsOpts): GenerateRegistrationOptionsOpts {
+    return options
+}
