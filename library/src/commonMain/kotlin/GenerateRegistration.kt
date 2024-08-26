@@ -1,7 +1,7 @@
 @file:OptIn(ExperimentalUnsignedTypes::class)
 
 import extensions.asBase64URLString
-import extensions.asIsoUByteArray
+import extensions.asUByteArray
 import kotlinx.serialization.Serializable
 import models.AttestationConveyancePreference
 import models.AuthenticationExtensionsClientInputs
@@ -53,16 +53,16 @@ class GenerateRegistrationOptionsOptsBuilder {
 
     var userID: UByteArray = Random.nextBytes(32).toUByteArray()
 
-    var base64URLUserID get(): String = userID.asBase64URLString()
+    var base64UserID get(): String = userID.asBase64URLString()
         set(value) {
-            userID = value.asIsoUByteArray()
+            userID = value.asUByteArray()
         }
 
     var challenge: UByteArray = Random.nextBytes(32).toUByteArray()
 
-    var base64URLChallenge get(): String = challenge.asBase64URLString()
+    var base64Challenge get(): String = challenge.asBase64URLString()
         set(value) {
-            challenge = value.asIsoUByteArray()
+            challenge = value.asUByteArray()
         }
 
     var userDisplayName: String = ""
