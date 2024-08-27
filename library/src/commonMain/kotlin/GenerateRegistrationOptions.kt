@@ -33,6 +33,65 @@ data class GenerateRegistrationOptionsOpts(
     val extensions: AuthenticationExtensionsClientInputs = AuthenticationExtensionsClientInputs(),
     val supportedAlgorithmIDs: List<COSEAlgorithmIdentifier> = defaultSupportedAlgorithmIDs
 ) {
+
+    @OptIn(ExperimentalUnsignedTypes::class)
+    class Builder {
+        var rpName: String = ""
+
+        var rpId: String = ""
+
+        var userName: String = ""
+
+        var userID: UByteArray = Random.nextBytes(32).toUByteArray()
+
+        var base64UserID get(): String = userID.encodeToBase64URLString()
+            set(value) {
+                userID = value.encodeToUByteArray()
+            }
+
+        var challenge: UByteArray = Random.nextBytes(32).toUByteArray()
+
+        var base64Challenge get(): String = challenge.encodeToBase64URLString()
+            set(value) {
+                challenge = value.encodeToUByteArray()
+            }
+
+        var userDisplayName: String = ""
+
+        var timeout: Long = 60000
+
+        var attestationType: AttestationConveyancePreference = AttestationConveyancePreference.NONE
+
+        var excludeCredentials: List<ExcludeCredential> = emptyList()
+
+        var authenticatorSelection: AuthenticatorSelectionCriteria = defaultAuthenticatorSelection
+
+        var extensions: AuthenticationExtensionsClientInputs = AuthenticationExtensionsClientInputs()
+
+        var supportedAlgorithmIDs: List<COSEAlgorithmIdentifier> = defaultSupportedAlgorithmIDs
+
+        fun authenticatorSelection(block: AuthenticatorSelectionCriteria.Builder.() -> Unit) {
+            authenticatorSelection = AuthenticatorSelectionCriteria.builder().apply(block).build()
+        }
+
+        fun build(): GenerateRegistrationOptionsOpts {
+            return GenerateRegistrationOptionsOpts(
+                rpName = rpName,
+                rpId = rpId,
+                userName = userName,
+                userID = userID,
+                challenge = challenge,
+                userDisplayName = userDisplayName,
+                timeout = timeout,
+                attestationType = attestationType,
+                excludeCredentials = excludeCredentials,
+                authenticatorSelection = authenticatorSelection,
+                extensions = extensions,
+                supportedAlgorithmIDs = supportedAlgorithmIDs,
+            )
+        }
+    }
+
     init {
         require(supportedAlgorithmIDs.isNotEmpty()) { "supportedAlgorithmIDs cannot be empty" }
         check(supportedAlgorithmIDs.all { it in supportedCOSEAlgorithmIdentifiers }) { "supportedAlgorithmIDs must be from $supportedCOSEAlgorithmIdentifiers" }
@@ -43,65 +102,10 @@ data class GenerateRegistrationOptionsOpts(
     }
 }
 
-
-@OptIn(ExperimentalUnsignedTypes::class)
-class GenerateRegistrationOptionsOptsBuilder {
-    var rpName: String = ""
-
-    var rpId: String = ""
-
-    var userName: String = ""
-
-    var userID: UByteArray = Random.nextBytes(32).toUByteArray()
-
-    var base64UserID get(): String = userID.encodeToBase64URLString()
-        set(value) {
-            userID = value.encodeToUByteArray()
-        }
-
-    var challenge: UByteArray = Random.nextBytes(32).toUByteArray()
-
-    var base64Challenge get(): String = challenge.encodeToBase64URLString()
-        set(value) {
-            challenge = value.encodeToUByteArray()
-        }
-
-    var userDisplayName: String = ""
-
-    var timeout: Long = 60000
-
-    var attestationType: AttestationConveyancePreference = AttestationConveyancePreference.NONE
-
-    var excludeCredentials: List<ExcludeCredential> = emptyList()
-
-    var authenticatorSelection: AuthenticatorSelectionCriteria = defaultAuthenticatorSelection
-
-    var extensions: AuthenticationExtensionsClientInputs = AuthenticationExtensionsClientInputs()
-
-    var supportedAlgorithmIDs: List<COSEAlgorithmIdentifier> = defaultSupportedAlgorithmIDs
-
-    fun build(): GenerateRegistrationOptionsOpts {
-        return GenerateRegistrationOptionsOpts(
-            rpName = rpName,
-            rpId = rpId,
-            userName = userName,
-            userID = userID,
-            challenge = challenge,
-            userDisplayName = userDisplayName,
-            timeout = timeout,
-            attestationType = attestationType,
-            excludeCredentials = excludeCredentials,
-            authenticatorSelection = authenticatorSelection,
-            extensions = extensions,
-            supportedAlgorithmIDs = supportedAlgorithmIDs,
-        )
-    }
-}
-
 inline fun generateRegistrationOptions(
-    block: GenerateRegistrationOptionsOptsBuilder.() -> Unit
+    block: GenerateRegistrationOptionsOpts.Builder.() -> Unit
 ): PublicKeyCredentialCreationOptions {
-    val options = GenerateRegistrationOptionsOptsBuilder().apply(block).build()
+    val options = GenerateRegistrationOptionsOpts.Builder().apply(block).build()
     return generateRegistrationOptions(options)
 }
 

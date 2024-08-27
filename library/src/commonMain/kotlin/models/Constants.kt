@@ -23,10 +23,10 @@ val supportedCOSEAlgorithmIdentifiers: List<COSEAlgorithmIdentifier> = listOf(
     -65535,
 )
 
-val defaultAuthenticatorSelection = AuthenticatorSelectionCriteria.create(
-    requireResidentKey = false,
-    residentKey = ResidentKeyRequirement.PREFERRED,
-    userVerification = UserVerificationRequirement.PREFERRED,
-)
+val defaultAuthenticatorSelection = AuthenticatorSelectionCriteria.builder().apply {
+    requireResidentKey = false
+    residentKey = ResidentKeyRequirement.PREFERRED
+    userVerification = UserVerificationRequirement.PREFERRED
+}.build()
 
 val defaultSupportedAlgorithmIDs: List<COSEAlgorithmIdentifier> = listOf(-8, -7, -257)
