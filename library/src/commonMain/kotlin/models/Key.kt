@@ -1,25 +1,58 @@
 package models
 
-enum class KeyFormat(val value: String) {
-    JWK("jwk"),
-    PKCS8("pkcs8"),
-    RAW("raw"),
-    SPKI("spki"),
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+@Serializable
+enum class KeyFormat {
+    @SerialName("jwk")
+    JWK,
+
+    @SerialName("pkcs8")
+    PKCS8,
+
+    @SerialName("raw")
+    RAW,
+
+    @SerialName("spki")
+    SPKI,
 }
 
-enum class KeyType(val value: String) {
-    PRIVATE("private"),
-    PUBLIC("public"),
-    SECRET("secret"),
+@Serializable
+enum class KeyType {
+    @SerialName("private")
+    PRIVATE,
+
+    @SerialName("public")
+    PUBLIC,
+
+    @SerialName("secret")
+    SECRET,
 }
 
-enum class KeyUsage(val value: String) {
-    DECRYPT("decrypt"),
-    DERIVE_BITS("deriveBits"),
-    DERIVE_KEY("deriveKey"),
-    ENCRYPT("encrypt"),
-    SIGN("sign"),
-    UNWRAP_KEY("unwrapKey"),
-    VERIFY("verify"),
-    WRAP_KEY("wrapKey"),
+@Serializable
+enum class KeyUsage {
+    @SerialName("decrypt")
+    DECRYPT,
+
+    @SerialName("deriveBits")
+    DERIVE_BITS,
+
+    @SerialName("deriveKey")
+    DERIVE_KEY,
+
+    @SerialName("encrypt")
+    ENCRYPT,
+
+    @SerialName("sign")
+    SIGN,
+
+    @SerialName("unwrapKey")
+    UNWRAP_KEY,
+
+    @SerialName("verify")
+    VERIFY,
+
+    @SerialName("wrapKey")
+    WRAP_KEY,
 }

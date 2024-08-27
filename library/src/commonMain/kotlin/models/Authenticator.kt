@@ -1,22 +1,23 @@
 package models
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-enum class AuthenticatorAttachment(val value: String) {
-    PLATFORM("platform"),
-    CROSS_PLATFORM("cross-platform"),
+enum class AuthenticatorAttachment {
+    @SerialName("platform") PLATFORM,
+    @SerialName("cross-platform") CROSS_PLATFORM,
 }
 
 @Serializable
-enum class AuthenticatorTransport(val value: String) {
-    USB("usb"),
-    BLE("ble"),
-    NFC("nfc"),
-    HYBRID("hybrid"),
-    INTERNAL("internal"),
-    SMART_CARD("smart-card"),
-    CABLE("cable"),
+enum class AuthenticatorTransport {
+    @SerialName("usb") USB,
+    @SerialName("ble") BLE,
+    @SerialName("nfc") NFC,
+    @SerialName("hybrid") HYBRID,
+    @SerialName("internal") INTERNAL,
+    @SerialName("smart-card") SMART_CARD,
+    @SerialName("cable") CABLE,
 }
 
 @Serializable

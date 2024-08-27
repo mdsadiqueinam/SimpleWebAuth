@@ -1,5 +1,6 @@
 import extensions.encodeToBase64URLString
 import models.AttestationConveyancePreference
+import models.ExcludeCredential
 import models.PublicKeyCredentialType
 import models.ResidentKeyRequirement
 import models.UserVerificationRequirement
@@ -9,23 +10,25 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class GenerateRegistrationOptionsTest {
+    private val rpName = "SimpleWebAuth"
+    private val rpId = "not.real"
+    private val base64UserID = "1234567890"
+    private val userId = base64UserID.encodeToByteArray().encodeToBase64URLString()
+    private val userName = "usernameHere"
+    private val userDisplayName = "userDisplayName"
+    private val challenge = "totallyrandomvalue"
+
     @Test
     fun shouldGenerateCredentialRequestOptionsSuitableForSendingViaJSON() {
-        val rpName = "SimpleWebAuth"
-        val rpId = "not.real"
-        val base64UserID = "1234567890"
-        val userId = base64UserID.encodeToByteArray().encodeToBase64URLString()
-        val userName = "usernameHere"
-        val userDisplayName = "userDisplayName"
         val options = generateRegistrationOptions {
-            this.rpName = rpName
-            this.rpId = rpId
-            base64Challenge = "totallyrandomvalue"
-            this.base64UserID = base64UserID
-            this.userName = userName
+            this.rpName = this@GenerateRegistrationOptionsTest.rpName
+            this.rpId = this@GenerateRegistrationOptionsTest.rpId
+            base64Challenge = this@GenerateRegistrationOptionsTest.challenge
+            this.base64UserID = this@GenerateRegistrationOptionsTest.base64UserID
+            this.userName = this@GenerateRegistrationOptionsTest.userName
             timeout = 1
             attestationType = AttestationConveyancePreference.INDIRECT
-            this.userDisplayName = userDisplayName
+            this.userDisplayName = this@GenerateRegistrationOptionsTest.userDisplayName
         }
 
         assertEquals(options.challenge, "dG90YWxseXJhbmRvbXZhbHVl")
@@ -45,5 +48,20 @@ class GenerateRegistrationOptionsTest {
         assertEquals(options.authenticatorSelection.userVerification, UserVerificationRequirement.PREFERRED)
         assertEquals(options.attestation, AttestationConveyancePreference.INDIRECT)
         assertEquals(options.extensions.credProps, true)
+    }
+
+    @Test
+    fun shouldMapExcludedCredentialIDsIfSpecified() {
+        val options = generateRegistrationOptions {
+            this.rpName = this@GenerateRegistrationOptionsTest.rpName
+            this.rpId = this@GenerateRegistrationOptionsTest.rpId
+            base64Challenge = this@GenerateRegistrationOptionsTest.challenge
+            this.base64UserID = this@GenerateRegistrationOptionsTest.base64UserID
+            this.userName = this@GenerateRegistrationOptionsTest.userName
+            excludeCredentials = listOf(ExcludeCredential(
+                id = "somewhereOverTheRainbow".encodeToByteArray().encodeToBase64URLString(),
+                transports = listOf()
+            ))
+        }
     }
 }

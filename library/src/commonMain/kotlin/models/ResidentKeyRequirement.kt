@@ -1,7 +1,16 @@
 package models
 
-enum class ResidentKeyRequirement(val value: String) {
-    REQUIRED("required"),
-    PREFERRED("preferred"),
-    DISCOURAGED("discouraged"),
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+@Serializable
+enum class ResidentKeyRequirement {
+    @SerialName("required")
+    REQUIRED,
+
+    @SerialName("preferred")
+    PREFERRED,
+
+    @SerialName("discouraged")
+    DISCOURAGED,
 }
