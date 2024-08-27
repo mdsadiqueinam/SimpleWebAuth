@@ -1,5 +1,6 @@
 import extensions.encodeToBase64URLString
 import models.AttestationConveyancePreference
+import models.AuthenticatorTransport
 import models.ExcludeCredential
 import models.PublicKeyCredentialType
 import models.ResidentKeyRequirement
@@ -59,9 +60,18 @@ class GenerateRegistrationOptionsTest {
             this.base64UserID = this@GenerateRegistrationOptionsTest.base64UserID
             this.userName = this@GenerateRegistrationOptionsTest.userName
             excludeCredentials = listOf(ExcludeCredential(
-                id = "somewhereOverTheRainbow".encodeToByteArray().encodeToBase64URLString(),
-                transports = listOf()
+                id = "somewhereOverTheRainbow",
+                transports = listOf(AuthenticatorTransport.USB, AuthenticatorTransport.NFC, AuthenticatorTransport.BLE, AuthenticatorTransport.HYBRID)
             ))
         }
+
+        assertEquals(options.excludeCredentials.size, 1)
+        assertEquals(options.excludeCredentials[0].id, "somewhereOverTheRainbow")
+        assertEquals(options.excludeCredentials[0].transports.size, 4)
+        assertTrue(options.excludeCredentials[0].transports.contains(AuthenticatorTransport.USB))
+        assertTrue(options.excludeCredentials[0].transports.contains(AuthenticatorTransport.NFC))
+        assertTrue(options.excludeCredentials[0].transports.contains(AuthenticatorTransport.BLE))
+        assertTrue(options.excludeCredentials[0].transports.contains(AuthenticatorTransport.HYBRID))
+        assertEquals(options.excludeCredentials[0].type, PublicKeyCredentialType)
     }
 }
