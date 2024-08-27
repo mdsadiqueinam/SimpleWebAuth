@@ -3,6 +3,8 @@ import models.AttestationConveyancePreference
 import models.AuthenticatorAttachment
 import models.AuthenticatorTransport
 import models.ExcludeCredential
+import models.PublicKeyCredentialDescriptor
+import models.PublicKeyCredentialParameters
 import models.PublicKeyCredentialType
 import models.ResidentKeyRequirement
 import models.UserVerificationRequirement
@@ -55,6 +57,12 @@ class GenerateRegistrationOptionsTest {
 
     @Test
     fun shouldMapExcludedCredentialIDsIfSpecified() {
+        val transports = listOf(
+            AuthenticatorTransport.USB,
+            AuthenticatorTransport.NFC,
+            AuthenticatorTransport.BLE,
+            AuthenticatorTransport.HYBRID
+        )
         val options = generateRegistrationOptions {
             this.rpName = this@GenerateRegistrationOptionsTest.rpName
             this.rpId = this@GenerateRegistrationOptionsTest.rpId
@@ -64,24 +72,19 @@ class GenerateRegistrationOptionsTest {
             excludeCredentials = listOf(
                 ExcludeCredential(
                     id = "somewhereOverTheRainbow",
-                    transports = listOf(
-                        AuthenticatorTransport.USB,
-                        AuthenticatorTransport.NFC,
-                        AuthenticatorTransport.BLE,
-                        AuthenticatorTransport.HYBRID
-                    )
+                    transports = transports
                 )
             )
         }
 
+        val publicKeyCredentialDescriptor = PublicKeyCredentialDescriptor(
+            id = "somewhereOverTheRainbow",
+            type = PublicKeyCredentialType,
+            transports = transports
+        )
+
         assertEquals(options.excludeCredentials.size, 1)
-        assertEquals(options.excludeCredentials[0].id, "somewhereOverTheRainbow")
-        assertEquals(options.excludeCredentials[0].transports.size, 4)
-        assertTrue(options.excludeCredentials[0].transports.contains(AuthenticatorTransport.USB))
-        assertTrue(options.excludeCredentials[0].transports.contains(AuthenticatorTransport.NFC))
-        assertTrue(options.excludeCredentials[0].transports.contains(AuthenticatorTransport.BLE))
-        assertTrue(options.excludeCredentials[0].transports.contains(AuthenticatorTransport.HYBRID))
-        assertEquals(options.excludeCredentials[0].type, PublicKeyCredentialType)
+        assertEquals(options.excludeCredentials[0], publicKeyCredentialDescriptor)
     }
 
     @Test
@@ -148,187 +151,183 @@ class GenerateRegistrationOptionsTest {
         assertEquals(options.extensions.appId, "simplewebauthn")
     }
 
-//    @Test
-//    fun shouldIncludeCredPropsIfExtensionsAreNotProvided() {
-//        val options = generateRegistrationOptions {
-//            this.rpName = this@GenerateRegistrationOptionsTest.rpName
-//            this.rpId = this@GenerateRegistrationOptionsTest.rpId
-//            this.userName = this@GenerateRegistrationOptionsTest.userName
-//        }
-//
-//        assertEquals(options.extensions.get("credProps"), true)
-//    }
-//
-//    @Test
-//    fun shouldIncludeCredPropsIfExtensionsAreProvided() {
-//        val options = generateRegistrationOptions {
-//            this.rpName = this@GenerateRegistrationOptionsTest.rpName
-//            this.rpId = this@GenerateRegistrationOptionsTest.rpId
-//            this.userName = this@GenerateRegistrationOptionsTest.userName
-//            extensions = mapOf("appid" to "simplewebauthn")
-//        }
-//
-//        assertEquals(options.extensions.get("credProps"), true)
-//    }
-//
-//    @Test
-//    fun shouldGenerateChallengeIfOneIsNotProvided() {
-//        val mockGenerateChallenge = mockk<ChallengeGenerator>()
-//        every { mockGenerateChallenge.generate() } returns "AQIDBAUGBwgJCgsMDQ4PEA"
-//
-//        val options = generateRegistrationOptions {
-//            this.rpId = this@GenerateRegistrationOptionsTest.rpId
-//            this.rpName = this@GenerateRegistrationOptionsTest.rpName
-//            this.userName = this@GenerateRegistrationOptionsTest.userName
-//        }
-//
-//        assertEquals(options.challenge, "AQIDBAUGBwgJCgsMDQ4PEA")
-//
-//        clearMocks(mockGenerateChallenge)
-//    }
-//
-//    @Test
-//    fun shouldTreatStringChallengesAsUTF8Strings() {
-//        val options = generateRegistrationOptions {
-//            this.rpId = this@GenerateRegistrationOptionsTest.rpId
-//            this.rpName = this@GenerateRegistrationOptionsTest.rpName
-//            this.userName = this@GenerateRegistrationOptionsTest.userName
-//            base64Challenge = "こんにちは"
-//        }
-//
-//        assertEquals(options.challenge, "44GT44KT44Gr44Gh44Gv")
-//    }
-//
-//    @Test
-//    fun shouldUseCustomSupportedAlgorithmIDsAsIsWhenProvided() {
-//        val customSupportedAlgorithmIDs = listOf(-7, -8, -65535)
-//        val options = generateRegistrationOptions {
-//            this.rpId = this@GenerateRegistrationOptionsTest.rpId
-//            this.rpName = this@GenerateRegistrationOptionsTest.rpName
-//            this.userName = this@GenerateRegistrationOptionsTest.userName
-//            supportedAlgorithmIDs = customSupportedAlgorithmIDs
-//        }
-//
-//        val expectedParams = customSupportedAlgorithmIDs.map { algId ->
-//            PublicKeyCredentialParameters(type = PublicKeyCredentialType.PUBLIC_KEY, alg = algId)
-//        }
-//
-//        assertEquals(options.pubKeyCredParams, expectedParams)
-//    }
-//
-//    @Test
-//    fun shouldRequireResidentKeyIfResidentKeyOptionIsAbsentButRequireResidentKeyIsSetToTrue() {
-//        val options = generateRegistrationOptions {
-//            this.rpId = this@GenerateRegistrationOptionsTest.rpId
-//            this.rpName = this@GenerateRegistrationOptionsTest.rpName
-//            this.userName = this@GenerateRegistrationOptionsTest.userName
-//            authenticatorSelection {
-//                requireResidentKey = true
-//            }
-//        }
-//
-//        assertEquals(options.authenticatorSelection.requireResidentKey, true)
-//        assertEquals(options.authenticatorSelection.residentKey, ResidentKeyRequirement.REQUIRED)
-//    }
-//
-//    @Test
-//    fun shouldDiscourageResidentKeyIfResidentKeyOptionIsAbsentButRequireResidentKeyIsSetToFalse() {
-//        val options = generateRegistrationOptions {
-//            this.rpId = this@GenerateRegistrationOptionsTest.rpId
-//            this.rpName = this@GenerateRegistrationOptionsTest.rpName
-//            this.userName = this@GenerateRegistrationOptionsTest.userName
-//            authenticatorSelection {
-//                requireResidentKey = false
-//            }
-//        }
-//
-//        assertEquals(options.authenticatorSelection.requireResidentKey, false)
-//        assertEquals(options.authenticatorSelection.residentKey, null)
-//    }
-//
-//    @Test
-//    fun shouldPreferResidentKeyIfBothResidentKeyAndRequireResidentKeyOptionsAreAbsent() {
-//        val options = generateRegistrationOptions {
-//            this.rpId = this@GenerateRegistrationOptionsTest.rpId
-//            this.rpName = this@GenerateRegistrationOptionsTest.rpName
-//            this.userName = this@GenerateRegistrationOptionsTest.userName
-//        }
-//
-//        assertEquals(options.authenticatorSelection.requireResidentKey, false)
-//        assertEquals(options.authenticatorSelection.residentKey, ResidentKeyRequirement.PREFERRED)
-//    }
-//
-//    @Test
-//    fun shouldSetRequireResidentKeyToTrueIfResidentKeyIsSetToRequired() {
-//        val options = generateRegistrationOptions {
-//            this.rpId = this@GenerateRegistrationOptionsTest.rpId
-//            this.rpName = this@GenerateRegistrationOptionsTest.rpName
-//            this.userName = this@GenerateRegistrationOptionsTest.userName
-//            authenticatorSelection {
-//                residentKey = ResidentKeyRequirement.REQUIRED
-//            }
-//        }
-//
-//        assertEquals(options.authenticatorSelection.requireResidentKey, true)
-//        assertEquals(options.authenticatorSelection.residentKey, ResidentKeyRequirement.REQUIRED)
-//    }
-//
-//    @Test
-//    fun shouldSetRequireResidentKeyToFalseIfResidentKeyIsSetToPreferred() {
-//        val options = generateRegistrationOptions {
-//            this.rpId = this@GenerateRegistrationOptionsTest.rpId
-//            this.rpName = this@GenerateRegistrationOptionsTest.rpName
-//            this.userName = this@GenerateRegistrationOptionsTest.userName
-//            authenticatorSelection {
-//                residentKey = ResidentKeyRequirement.PREFERRED
-//            }
-//        }
-//
-//        assertEquals(options.authenticatorSelection.requireResidentKey, false)
-//        assertEquals(options.authenticatorSelection.residentKey, ResidentKeyRequirement.PREFERRED)
-//    }
-//
-//    @Test
-//    fun shouldSetRequireResidentKeyToFalseIfResidentKeyIsSetToDiscouraged() {
-//        val options = generateRegistrationOptions {
-//            this.rpId = this@GenerateRegistrationOptionsTest.rpId
-//            this.rpName = this@GenerateRegistrationOptionsTest.rpName
-//            this.userName = this@GenerateRegistrationOptionsTest.userName
-//            authenticatorSelection {
-//                residentKey = ResidentKeyRequirement.DISCOURAGED
-//            }
-//        }
-//
-//        assertEquals(options.authenticatorSelection.requireResidentKey, false)
-//        assertEquals(options.authenticatorSelection.residentKey, ResidentKeyRequirement.DISCOURAGED)
-//    }
-//
-//    @Test
-//    fun shouldPreferEd25519InPubKeyCredParams() {
-//        val options = generateRegistrationOptions {
-//            this.rpName = this@GenerateRegistrationOptionsTest.rpName
-//            this.rpId = this@GenerateRegistrationOptionsTest.rpId
-//            base64Challenge = this@GenerateRegistrationOptionsTest.challenge
-//            this.userName = this@GenerateRegistrationOptionsTest.userName
-//        }
-//
-//        assertEquals(options.pubKeyCredParams[0].alg, -8)
-//    }
-//
-//    @Test
-//    fun shouldRaiseErrorIfStringIsSpecifiedForUserID() {
-//        val exception = assertFailsWith<IllegalArgumentException> {
-//            generateRegistrationOptions {
-//                this.rpName = this@GenerateRegistrationOptionsTest.rpName
-//                this.rpId = this@GenerateRegistrationOptionsTest.rpId
-//                this.userName = this@GenerateRegistrationOptionsTest.userName
-//                // @ts-ignore: Pretending a dev missed a refactor between v9 and v10
-//                this.base64UserID = "customUserID"
-//            }
-//        }
-//        assertEquals(
-//            exception.message,
-//            "String values for `userID` are no longer supported. See https://simplewebauthn.dev/docs/advanced/server/custom-user-ids"
-//        )
-//    }
+    @Test
+    fun shouldIncludeCredPropsIfExtensionsAreNotProvided() {
+        val options = generateRegistrationOptions {
+            this.rpName = this@GenerateRegistrationOptionsTest.rpName
+            this.rpId = this@GenerateRegistrationOptionsTest.rpId
+            this.userName = this@GenerateRegistrationOptionsTest.userName
+        }
+
+        assertEquals(options.extensions.credProps, true)
+    }
+
+    @Test
+    fun shouldIncludeCredPropsIfExtensionsAreProvided() {
+        val options = generateRegistrationOptions {
+            this.rpName = this@GenerateRegistrationOptionsTest.rpName
+            this.rpId = this@GenerateRegistrationOptionsTest.rpId
+            this.userName = this@GenerateRegistrationOptionsTest.userName
+            extensions {
+                appId = "simplewebauthn"
+            }
+        }
+
+        assertEquals(options.extensions.credProps, true)
+    }
+
+    @Test
+    fun shouldGenerateChallengeIfOneIsNotProvided() {
+        val options = generateRegistrationOptions {
+            this.rpId = this@GenerateRegistrationOptionsTest.rpId
+            this.rpName = this@GenerateRegistrationOptionsTest.rpName
+            this.userName = this@GenerateRegistrationOptionsTest.userName
+        }
+
+        assertTrue(options.challenge.isNotEmpty())
+    }
+
+    @Test
+    fun shouldTreatStringChallengesAsUTF8Strings() {
+        val options = generateRegistrationOptions {
+            this.rpId = this@GenerateRegistrationOptionsTest.rpId
+            this.rpName = this@GenerateRegistrationOptionsTest.rpName
+            this.userName = this@GenerateRegistrationOptionsTest.userName
+            base64Challenge = "こんにちは"
+        }
+
+        assertEquals(options.challenge, "44GT44KT44Gr44Gh44Gv")
+    }
+
+    @Test
+    fun shouldUseCustomSupportedAlgorithmIDsAsIsWhenProvided() {
+        val customSupportedAlgorithmIDs = listOf(-7, -8, -65535)
+        val options = generateRegistrationOptions {
+            this.rpId = this@GenerateRegistrationOptionsTest.rpId
+            this.rpName = this@GenerateRegistrationOptionsTest.rpName
+            this.userName = this@GenerateRegistrationOptionsTest.userName
+            supportedAlgorithmIDs = customSupportedAlgorithmIDs
+        }
+
+        val expectedParams = customSupportedAlgorithmIDs.map { algId ->
+            PublicKeyCredentialParameters(type = PublicKeyCredentialType, alg = algId)
+        }
+
+        assertEquals(options.pubKeyCredParams, expectedParams)
+    }
+
+    @Test
+    fun shouldRequireResidentKeyIfResidentKeyOptionIsAbsentButRequireResidentKeyIsSetToTrue() {
+        val options = generateRegistrationOptions {
+            this.rpId = this@GenerateRegistrationOptionsTest.rpId
+            this.rpName = this@GenerateRegistrationOptionsTest.rpName
+            this.userName = this@GenerateRegistrationOptionsTest.userName
+            authenticatorSelection {
+                requireResidentKey = true
+            }
+        }
+
+        assertEquals(options.authenticatorSelection.requireResidentKey, true)
+        assertEquals(options.authenticatorSelection.residentKey, ResidentKeyRequirement.REQUIRED)
+    }
+
+    @Test
+    fun shouldDiscourageResidentKeyIfResidentKeyOptionIsAbsentButRequireResidentKeyIsSetToFalse() {
+        val options = generateRegistrationOptions {
+            this.rpId = this@GenerateRegistrationOptionsTest.rpId
+            this.rpName = this@GenerateRegistrationOptionsTest.rpName
+            this.userName = this@GenerateRegistrationOptionsTest.userName
+            authenticatorSelection {
+                requireResidentKey = false
+            }
+        }
+
+        assertEquals(options.authenticatorSelection.requireResidentKey, false)
+        assertEquals(options.authenticatorSelection.residentKey, null)
+    }
+
+    @Test
+    fun shouldPreferResidentKeyIfBothResidentKeyAndRequireResidentKeyOptionsAreAbsent() {
+        val options = generateRegistrationOptions {
+            this.rpId = this@GenerateRegistrationOptionsTest.rpId
+            this.rpName = this@GenerateRegistrationOptionsTest.rpName
+            this.userName = this@GenerateRegistrationOptionsTest.userName
+        }
+
+        assertEquals(options.authenticatorSelection.requireResidentKey, false)
+        assertEquals(options.authenticatorSelection.residentKey, ResidentKeyRequirement.PREFERRED)
+    }
+
+    @Test
+    fun shouldSetRequireResidentKeyToTrueIfResidentKeyIsSetToRequired() {
+        val options = generateRegistrationOptions {
+            this.rpId = this@GenerateRegistrationOptionsTest.rpId
+            this.rpName = this@GenerateRegistrationOptionsTest.rpName
+            this.userName = this@GenerateRegistrationOptionsTest.userName
+            authenticatorSelection {
+                residentKey = ResidentKeyRequirement.REQUIRED
+            }
+        }
+
+        assertEquals(options.authenticatorSelection.requireResidentKey, true)
+        assertEquals(options.authenticatorSelection.residentKey, ResidentKeyRequirement.REQUIRED)
+    }
+
+    @Test
+    fun shouldSetRequireResidentKeyToFalseIfResidentKeyIsSetToPreferred() {
+        val options = generateRegistrationOptions {
+            this.rpId = this@GenerateRegistrationOptionsTest.rpId
+            this.rpName = this@GenerateRegistrationOptionsTest.rpName
+            this.userName = this@GenerateRegistrationOptionsTest.userName
+            authenticatorSelection {
+                residentKey = ResidentKeyRequirement.PREFERRED
+            }
+        }
+
+        assertEquals(options.authenticatorSelection.requireResidentKey, false)
+        assertEquals(options.authenticatorSelection.residentKey, ResidentKeyRequirement.PREFERRED)
+    }
+
+    @Test
+    fun shouldSetRequireResidentKeyToFalseIfResidentKeyIsSetToDiscouraged() {
+        val options = generateRegistrationOptions {
+            this.rpId = this@GenerateRegistrationOptionsTest.rpId
+            this.rpName = this@GenerateRegistrationOptionsTest.rpName
+            this.userName = this@GenerateRegistrationOptionsTest.userName
+            authenticatorSelection {
+                residentKey = ResidentKeyRequirement.DISCOURAGED
+            }
+        }
+
+        assertEquals(options.authenticatorSelection.requireResidentKey, false)
+        assertEquals(options.authenticatorSelection.residentKey, ResidentKeyRequirement.DISCOURAGED)
+    }
+
+    @Test
+    fun shouldPreferEd25519InPubKeyCredParams() {
+        val options = generateRegistrationOptions {
+            this.rpName = this@GenerateRegistrationOptionsTest.rpName
+            this.rpId = this@GenerateRegistrationOptionsTest.rpId
+            base64Challenge = this@GenerateRegistrationOptionsTest.challenge
+            this.userName = this@GenerateRegistrationOptionsTest.userName
+        }
+
+        assertEquals(options.pubKeyCredParams[0].alg, -8)
+    }
+
+    @Test
+    fun shouldRaiseErrorIfStringIsSpecifiedForUserID() {
+        val exception = assertFailsWith<IllegalArgumentException> {
+            generateRegistrationOptions {
+                this.rpName = this@GenerateRegistrationOptionsTest.rpName
+                this.rpId = this@GenerateRegistrationOptionsTest.rpId
+                this.userName = this@GenerateRegistrationOptionsTest.userName
+                this.base64UserID = "customUserID"
+            }
+        }
+        assertEquals(
+            exception.message,
+            "String values for `userID` are no longer supported. See https://simplewebauthn.dev/docs/advanced/server/custom-user-ids"
+        )
+    }
 }
