@@ -1,5 +1,6 @@
 import extensions.encodeToBase64URLString
 import models.AttestationConveyancePreference
+import models.AuthenticatorAttachment
 import models.AuthenticatorTransport
 import models.ExcludeCredential
 import models.PublicKeyCredentialType
@@ -113,38 +114,40 @@ class GenerateRegistrationOptionsTest {
         assertEquals(options.user.displayName, "")
     }
 
-//    @Test
-//    fun shouldSetAuthenticatorSelectionIfSpecified() {
-//        val options = generateRegistrationOptions {
-//            this.rpName = this@GenerateRegistrationOptionsTest.rpName
-//            this.rpId = this@GenerateRegistrationOptionsTest.rpId
-//            base64Challenge = this@GenerateRegistrationOptionsTest.challenge
-//            this.userName = this@GenerateRegistrationOptionsTest.userName
-//            authenticatorSelection {
-//                authenticatorAttachment = "cross-platform"
-//                requireResidentKey = false
-//                userVerification = UserVerificationRequirement.PREFERRED
-//            }
-//        }
-//
-//        assertEquals(options.authenticatorSelection.authenticatorAttachment, "cross-platform")
-//        assertEquals(options.authenticatorSelection.requireResidentKey, false)
-//        assertEquals(options.authenticatorSelection.userVerification, UserVerificationRequirement.PREFERRED)
-//    }
-//
-//    @Test
-//    fun shouldSetExtensionsIfSpecified() {
-//        val options = generateRegistrationOptions {
-//            this.rpName = this@GenerateRegistrationOptionsTest.rpName
-//            this.rpId = this@GenerateRegistrationOptionsTest.rpId
-//            base64Challenge = this@GenerateRegistrationOptionsTest.challenge
-//            this.userName = this@GenerateRegistrationOptionsTest.userName
-//            extensions = mapOf("appid" to "simplewebauthn")
-//        }
-//
-//        assertEquals(options.extensions.get("appid"), "simplewebauthn")
-//    }
-//
+    @Test
+    fun shouldSetAuthenticatorSelectionIfSpecified() {
+        val options = generateRegistrationOptions {
+            this.rpName = this@GenerateRegistrationOptionsTest.rpName
+            this.rpId = this@GenerateRegistrationOptionsTest.rpId
+            base64Challenge = this@GenerateRegistrationOptionsTest.challenge
+            this.userName = this@GenerateRegistrationOptionsTest.userName
+            authenticatorSelection {
+                authenticatorAttachment = AuthenticatorAttachment.CROSS_PLATFORM
+                requireResidentKey = false
+                userVerification = UserVerificationRequirement.PREFERRED
+            }
+        }
+
+        assertEquals(options.authenticatorSelection.authenticatorAttachment, AuthenticatorAttachment.CROSS_PLATFORM)
+        assertEquals(options.authenticatorSelection.requireResidentKey, false)
+        assertEquals(options.authenticatorSelection.userVerification, UserVerificationRequirement.PREFERRED)
+    }
+
+    @Test
+    fun shouldSetExtensionsIfSpecified() {
+        val options = generateRegistrationOptions {
+            this.rpName = this@GenerateRegistrationOptionsTest.rpName
+            this.rpId = this@GenerateRegistrationOptionsTest.rpId
+            base64Challenge = this@GenerateRegistrationOptionsTest.challenge
+            this.userName = this@GenerateRegistrationOptionsTest.userName
+            extensions {
+                appId = "simplewebauthn"
+            }
+        }
+
+        assertEquals(options.extensions.appId, "simplewebauthn")
+    }
+
 //    @Test
 //    fun shouldIncludeCredPropsIfExtensionsAreNotProvided() {
 //        val options = generateRegistrationOptions {

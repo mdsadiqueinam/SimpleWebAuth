@@ -62,6 +62,9 @@ data class GenerateRegistrationOptionsOpts(
         fun authenticatorSelection(block: AuthenticatorSelectionCriteria.Builder.() -> Unit) =
             apply { authenticatorSelection = AuthenticatorSelectionCriteria.builder().apply(block).build() }
 
+        fun extensions(block: AuthenticationExtensionsClientInputs.Builder.() -> Unit) =
+            apply { extensions = AuthenticationExtensionsClientInputs.builder().apply(block).build() }
+
         fun build() = GenerateRegistrationOptionsOpts(
             rpName = rpName,
             rpId = rpId,
@@ -95,6 +98,7 @@ inline fun generateRegistrationOptions(
     return generateRegistrationOptions(options)
 }
 
+@OptIn(ExperimentalUnsignedTypes::class)
 fun generateRegistrationOptions(options: GenerateRegistrationOptionsOpts): PublicKeyCredentialCreationOptions {
     return PublicKeyCredentialCreationOptions(
         challenge = options.challenge.encodeToBase64URLString(),
