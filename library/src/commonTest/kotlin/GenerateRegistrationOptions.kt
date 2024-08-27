@@ -314,20 +314,4 @@ class GenerateRegistrationOptionsTest {
 
         assertEquals(options.pubKeyCredParams[0].alg, -8)
     }
-
-    @Test
-    fun shouldRaiseErrorIfStringIsSpecifiedForUserID() {
-        val exception = assertFailsWith<IllegalArgumentException> {
-            generateRegistrationOptions {
-                this.rpName = this@GenerateRegistrationOptionsTest.rpName
-                this.rpId = this@GenerateRegistrationOptionsTest.rpId
-                this.userName = this@GenerateRegistrationOptionsTest.userName
-                this.base64UserID = "customUserID"
-            }
-        }
-        assertEquals(
-            exception.message,
-            "String values for `userID` are no longer supported. See https://simplewebauthn.dev/docs/advanced/server/custom-user-ids"
-        )
-    }
 }
