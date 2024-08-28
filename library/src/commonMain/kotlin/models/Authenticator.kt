@@ -2,6 +2,7 @@ package models
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlin.properties.Delegates
 
 @Serializable
 enum class AuthenticatorAttachment {
@@ -60,6 +61,48 @@ data class AuthenticatorSelectionCriteria(
                 requireResidentKey = _requireResidentKey,
                 residentKey = _residentKey,
                 userVerification,
+            )
+        }
+    }
+
+    companion object {
+        fun builder() = Builder()
+    }
+}
+
+data class AuthenticatorAttestationResponse(
+    val clientDataJSON: Base64URLString,
+    val attestationObject: Base64URLString,
+    val authenticatorData: Base64URLString,
+    val transports: List<AuthenticatorTransport>,
+    val publicKeyAlgorithm: COSEAlgorithmIdentifier,
+    val publicKey: Base64URLString? = null
+) {
+    class Builder {
+        lateinit var clientDataJSON: Base64URLString
+        lateinit var attestationObject: Base64URLString
+        lateinit var authenticatorData: Base64URLString
+        lateinit var transports: List<AuthenticatorTransport>
+        var publicKeyAlgorithm by Delegates.notNull<COSEAlgorithmIdentifier>()
+        var publicKey: Base64URLString? = null
+
+        fun clientDataJSON(clientDataJSON: Base64URLString) = apply { this.clientDataJSON = clientDataJSON }
+        fun attestationObject(attestationObject: Base64URLString) = apply { this.attestationObject = attestationObject }
+        fun authenticatorData(authenticatorData: Base64URLString) = apply { this.authenticatorData = authenticatorData }
+        fun transports(transports: List<AuthenticatorTransport>) = apply { this.transports = transports }
+        fun publicKeyAlgorithm(publicKeyAlgorithm: COSEAlgorithmIdentifier) =
+            apply { this.publicKeyAlgorithm = publicKeyAlgorithm }
+
+        fun publicKey(publicKey: Base64URLString?) = apply { this.publicKey = publicKey }
+
+        fun build(): AuthenticatorAttestationResponse {
+            return AuthenticatorAttestationResponse(
+                clientDataJSON = this.clientDataJSON,
+                attestationObject = this.attestationObject,
+                authenticatorData = this.authenticatorData,
+                transports = this.transports,
+                publicKeyAlgorithm = this.publicKeyAlgorithm,
+                publicKey = this.publicKey
             )
         }
     }

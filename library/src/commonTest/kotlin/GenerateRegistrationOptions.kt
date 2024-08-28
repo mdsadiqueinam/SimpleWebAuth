@@ -5,13 +5,12 @@ import models.AuthenticatorTransport
 import models.ExcludeCredential
 import models.PublicKeyCredentialDescriptor
 import models.PublicKeyCredentialParameters
-import models.PublicKeyCredentialType
+import models.CredentialType
 import models.ResidentKeyRequirement
 import models.UserVerificationRequirement
 import models.defaultSupportedAlgorithmIDs
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 class GenerateRegistrationOptionsTest {
@@ -44,7 +43,7 @@ class GenerateRegistrationOptionsTest {
         assertEquals(options.user.displayName, userDisplayName)
         assertEquals(options.timeout, 1)
         assertEquals(options.attestation, AttestationConveyancePreference.INDIRECT)
-        assertTrue(defaultSupportedAlgorithmIDs.all { id -> options.pubKeyCredParams.find { it.alg == id && it.type == PublicKeyCredentialType } != null })
+        assertTrue(defaultSupportedAlgorithmIDs.all { id -> options.pubKeyCredParams.find { it.alg == id && it.type == CredentialType.PUBLIC_KEY } != null })
         assertEquals(options.pubKeyCredParams.size, defaultSupportedAlgorithmIDs.size)
         assertEquals(options.excludeCredentials.size, 0)
         assertEquals(options.authenticatorSelection.authenticatorAttachment, null)
@@ -79,7 +78,7 @@ class GenerateRegistrationOptionsTest {
 
         val publicKeyCredentialDescriptor = PublicKeyCredentialDescriptor(
             id = "somewhereOverTheRainbow",
-            type = PublicKeyCredentialType,
+            type = CredentialType.PUBLIC_KEY,
             transports = transports
         )
 
@@ -210,7 +209,7 @@ class GenerateRegistrationOptionsTest {
         }
 
         val expectedParams = customSupportedAlgorithmIDs.map { algId ->
-            PublicKeyCredentialParameters(type = PublicKeyCredentialType, alg = algId)
+            PublicKeyCredentialParameters(type = CredentialType.PUBLIC_KEY, alg = algId)
         }
 
         assertEquals(options.pubKeyCredParams, expectedParams)
