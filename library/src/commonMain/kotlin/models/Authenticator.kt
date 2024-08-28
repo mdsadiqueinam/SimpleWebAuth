@@ -1,5 +1,7 @@
 package models
 
+import Base64URLString
+import COSEAlgorithmIdentifier
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.properties.Delegates
@@ -110,4 +112,6 @@ data class AuthenticatorAttestationResponse(
     companion object {
         fun builder() = Builder()
     }
+
+//    val decodedClientDataJson get() {}
 }

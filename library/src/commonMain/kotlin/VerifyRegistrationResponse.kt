@@ -1,4 +1,3 @@
-import models.COSEAlgorithmIdentifier
 import models.RegistrationResponse
 import models.defaultSupportedAlgorithmIDs
 

@@ -1,5 +1,7 @@
 package models
 
+import Base64URLString
+
 data class RegistrationResponse(
     val id: String,
     val rawId: Base64URLString,

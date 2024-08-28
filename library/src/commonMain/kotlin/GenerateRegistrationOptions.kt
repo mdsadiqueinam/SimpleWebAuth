@@ -6,7 +6,6 @@ import kotlinx.serialization.Serializable
 import models.AttestationConveyancePreference
 import models.AuthenticationExtensionsClientInputs
 import models.AuthenticatorSelectionCriteria
-import models.COSEAlgorithmIdentifier
 import models.ExcludeCredential
 import models.PublicKeyCredentialCreationOptions
 import models.PublicKeyCredentialDescriptor

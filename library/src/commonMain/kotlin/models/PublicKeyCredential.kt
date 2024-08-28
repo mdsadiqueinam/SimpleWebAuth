@@ -1,5 +1,7 @@
 package models
 
+import Base64URLString
+import COSEAlgorithmIdentifier
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
