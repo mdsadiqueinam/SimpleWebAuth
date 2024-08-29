@@ -22,6 +22,13 @@ fun Base64URLString.encodeToUByteArray(): UByteArray {
     }
 }
 
-fun Base64URLString.encodeToUTF8(): String {
-    return encodeToByteArray().decodeToString()
+@OptIn(ExperimentalUnsignedTypes::class)
+fun Base64URLString.decodeToUTF8(): String {
+    return encodeToUByteArray().asByteArray().decodeToString()
+}
+
+fun String.encodeToBase64URLString(): Base64URLString {
+    val encoded = encodeToByteArray().encodeToBase64URLString()
+    val padLength = (4 - (encoded.length % 4)) % 4
+    return encoded.padEnd(encoded.length + padLength, '=')
 }
