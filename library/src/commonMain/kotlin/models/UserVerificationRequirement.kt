@@ -4,13 +4,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-enum class UserVerificationRequirement {
-    @SerialName("required")
-    REQUIRED,
-
-    @SerialName("preferred")
-    PREFERRED,
-
-    @SerialName("discouraged")
-    DISCOURAGED,
+enum class UserVerificationRequirement(val value: String) {
+    @SerialName("required") REQUIRED("required"),
+    @SerialName("preferred") PREFERRED("preferred"),
+    @SerialName("discouraged") DISCOURAGED("discouraged"),
 }

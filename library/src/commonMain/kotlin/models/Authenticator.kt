@@ -2,25 +2,27 @@ package models
 
 import Base64URLString
 import COSEAlgorithmIdentifier
+import extensions.decodeToUTF8
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import kotlin.properties.Delegates
 
 @Serializable
-enum class AuthenticatorAttachment {
-    @SerialName("platform") PLATFORM,
-    @SerialName("cross-platform") CROSS_PLATFORM,
+enum class AuthenticatorAttachment(val value: String) {
+    @SerialName("platform") PLATFORM("platform"),
+    @SerialName("cross-platform") CROSS_PLATFORM("cross-platform"),
 }
 
 @Serializable
-enum class AuthenticatorTransport {
-    @SerialName("usb") USB,
-    @SerialName("ble") BLE,
-    @SerialName("nfc") NFC,
-    @SerialName("hybrid") HYBRID,
-    @SerialName("internal") INTERNAL,
-    @SerialName("smart-card") SMART_CARD,
-    @SerialName("cable") CABLE,
+enum class AuthenticatorTransport(val value: String) {
+    @SerialName("usb") USB("usb"),
+    @SerialName("ble") BLE("ble"),
+    @SerialName("nfc") NFC("nfc"),
+    @SerialName("hybrid") HYBRID("hybrid"),
+    @SerialName("internal") INTERNAL("internal"),
+    @SerialName("smart-card") SMART_CARD("smart-card"),
+    @SerialName("cable") CABLE("cable"),
 }
 
 @Serializable
@@ -113,5 +115,8 @@ data class AuthenticatorAttestationResponse(
         fun builder() = Builder()
     }
 
-//    val decodedClientDataJson get() {}
+    val decodedClientDataJson get(): ClientData {
+        val decoded = clientDataJSON.decodeToUTF8()
+        return Json.decodeFromString<ClientData>(decoded)
+    }
 }

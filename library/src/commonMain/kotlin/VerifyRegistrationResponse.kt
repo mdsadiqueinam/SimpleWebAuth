@@ -47,8 +47,6 @@ data class VerifyRegistrationResponseOpts(
             )
         }
     }
-
-    companion object {
-        fun builder() = Builder()
-    }
 }
+
+fun verifyRegistrationResponse(options: GenerateRegistrationOptionsOpts) {}

@@ -21,8 +21,10 @@ data class TokenBinding(
     enum class Status {
         @SerialName("present")
         Present,
+
         @SerialName("supported")
         Supported,
+
         @SerialName("not-supported")
         NotSupported,
     }

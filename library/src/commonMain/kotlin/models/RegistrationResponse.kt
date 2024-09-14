@@ -12,7 +12,7 @@ data class RegistrationResponse(
 ) {
     init {
         require(id != rawId) { "Credential ID was not base64url-encoded" }
-        require(type == CredentialType.PUBLIC_KEY) { "Credential type was not public-key" }
+        require(type == CredentialType.PUBLIC_KEY) { "Unexpected Credential type: $type, expected \"${CredentialType.PUBLIC_KEY}\"" }
     }
 
     class Builder {
