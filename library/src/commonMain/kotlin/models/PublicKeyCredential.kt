@@ -1,15 +1,30 @@
 package models
 
+import Base64URLString
+import COSEAlgorithmIdentifier
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-object PublicKeyCredentialType : CharSequence by "public-key" {}
+enum class CredentialType {
+    @SerialName("public-key") PUBLIC_KEY,
+}
+
+@Serializable
+enum class CredentialDeviceType(val value: String) {
+    @SerialName("singleDevice") SINGLE_DEVICE("singleDevice"),
+    @SerialName("multiDevice") MULTI_DEVICE("multiDevice");
+}
 
 @Serializable
 data class PublicKeyCredentialParameters(
     val alg: COSEAlgorithmIdentifier,
-    val type: PublicKeyCredentialType = PublicKeyCredentialType,
-)
+    val type: CredentialType = CredentialType.PUBLIC_KEY,
+) {
+    init {
+        require(type == CredentialType.PUBLIC_KEY) { "type must be public-key" }
+    }
+}
 
 @Serializable
 data class PublicKeyCredentialRpEntity(
@@ -27,9 +42,13 @@ data class PublicKeyCredentialUserEntity(
 @Serializable
 data class PublicKeyCredentialDescriptor(
     val id: Base64URLString,
-    val type: PublicKeyCredentialType = PublicKeyCredentialType,
+    val type: CredentialType = CredentialType.PUBLIC_KEY,
     val transports: List<AuthenticatorTransport>
-)
+) {
+    init {
+        require(type == CredentialType.PUBLIC_KEY) { "type must be public-key" }
+    }
+}
 
 @Serializable
 data class PublicKeyCredentialCreationOptions(

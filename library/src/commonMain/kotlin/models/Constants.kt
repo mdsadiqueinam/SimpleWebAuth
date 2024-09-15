@@ -1,5 +1,7 @@
 package models
 
+import COSEAlgorithmIdentifier
+
 val supportedCOSEAlgorithmIdentifiers: List<COSEAlgorithmIdentifier> = listOf(
     // EdDSA (In first position to encourage authenticators to use this over ES256)
     -8,

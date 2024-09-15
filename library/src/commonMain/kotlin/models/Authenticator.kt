@@ -1,23 +1,31 @@
 package models
 
+import Base64URLString
+import COSEAlgorithmIdentifier
+import extensions.decodeToUTF8
+import extensions.encodeToUByteArray
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.cbor.Cbor
+import kotlinx.serialization.json.Json
+import kotlin.properties.Delegates
 
 @Serializable
-enum class AuthenticatorAttachment {
-    @SerialName("platform") PLATFORM,
-    @SerialName("cross-platform") CROSS_PLATFORM,
+enum class AuthenticatorAttachment(val value: String) {
+    @SerialName("platform") PLATFORM("platform"),
+    @SerialName("cross-platform") CROSS_PLATFORM("cross-platform"),
 }
 
 @Serializable
-enum class AuthenticatorTransport {
-    @SerialName("usb") USB,
-    @SerialName("ble") BLE,
-    @SerialName("nfc") NFC,
-    @SerialName("hybrid") HYBRID,
-    @SerialName("internal") INTERNAL,
-    @SerialName("smart-card") SMART_CARD,
-    @SerialName("cable") CABLE,
+enum class AuthenticatorTransport(val value: String) {
+    @SerialName("usb") USB("usb"),
+    @SerialName("ble") BLE("ble"),
+    @SerialName("nfc") NFC("nfc"),
+    @SerialName("hybrid") HYBRID("hybrid"),
+    @SerialName("internal") INTERNAL("internal"),
+    @SerialName("smart-card") SMART_CARD("smart-card"),
+    @SerialName("cable") CABLE("cable"),
 }
 
 @Serializable
@@ -66,5 +74,84 @@ data class AuthenticatorSelectionCriteria(
 
     companion object {
         fun builder() = Builder()
+    }
+}
+
+@OptIn(ExperimentalUnsignedTypes::class)
+@Serializable
+data class ParsedAuthenticatorData(
+    val rpIdHash: UByteArray,
+    val flagsBuf: UByteArray,
+    val flags: Flags,
+    val counter: Int,
+    val counterBuf: UByteArray,
+    val aaguid: UByteArray? = null,
+    val credentialID: UByteArray? = null,
+    val credentialPublicKey: UByteArray? = null,
+    val extensionsData: AuthenticationExtensionsAuthenticatorOutputs? = null,
+    val extensionsDataBuffer: UByteArray? = null
+) {
+    @Serializable
+    data class Flags(
+        val up: Boolean,
+        val uv: Boolean,
+        val be: Boolean,
+        val bs: Boolean,
+        val at: Boolean,
+        val ed: Boolean,
+        val flagsInt: Int
+    )
+}
+
+
+@OptIn(ExperimentalUnsignedTypes::class, ExperimentalSerializationApi::class)
+data class AuthenticatorAttestationResponse(
+    val clientDataJSON: Base64URLString,
+    val attestationObject: Base64URLString,
+    val authenticatorData: Base64URLString,
+    val transports: List<AuthenticatorTransport>,
+    val publicKeyAlgorithm: COSEAlgorithmIdentifier,
+    val publicKey: Base64URLString? = null
+) {
+    class Builder {
+        lateinit var clientDataJSON: Base64URLString
+        lateinit var attestationObject: Base64URLString
+        lateinit var authenticatorData: Base64URLString
+        lateinit var transports: List<AuthenticatorTransport>
+        var publicKeyAlgorithm by Delegates.notNull<COSEAlgorithmIdentifier>()
+        var publicKey: Base64URLString? = null
+
+        fun clientDataJSON(clientDataJSON: Base64URLString) = apply { this.clientDataJSON = clientDataJSON }
+        fun attestationObject(attestationObject: Base64URLString) = apply { this.attestationObject = attestationObject }
+        fun authenticatorData(authenticatorData: Base64URLString) = apply { this.authenticatorData = authenticatorData }
+        fun transports(transports: List<AuthenticatorTransport>) = apply { this.transports = transports }
+        fun publicKeyAlgorithm(publicKeyAlgorithm: COSEAlgorithmIdentifier) =
+            apply { this.publicKeyAlgorithm = publicKeyAlgorithm }
+
+        fun publicKey(publicKey: Base64URLString?) = apply { this.publicKey = publicKey }
+
+        fun build(): AuthenticatorAttestationResponse {
+            return AuthenticatorAttestationResponse(
+                clientDataJSON = this.clientDataJSON,
+                attestationObject = this.attestationObject,
+                authenticatorData = this.authenticatorData,
+                transports = this.transports,
+                publicKeyAlgorithm = this.publicKeyAlgorithm,
+                publicKey = this.publicKey
+            )
+        }
+    }
+
+    companion object {
+        fun builder() = Builder()
+    }
+
+    val decodedClientDataJson get(): ClientData {
+        val decoded = clientDataJSON.decodeToUTF8()
+        return Json.decodeFromString<ClientData>(decoded)
+    }
+
+    val decodedAttestationObject get(): AttestationObject {
+        return Cbor.decodeFromByteArray(AttestationObject.serializer(), attestationObject.encodeToUByteArray().asByteArray())
     }
 }

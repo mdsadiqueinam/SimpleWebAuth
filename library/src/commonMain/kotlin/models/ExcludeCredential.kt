@@ -1,5 +1,6 @@
 package models
 
+import Base64URLString
 import kotlinx.serialization.Serializable
 
 @Serializable
