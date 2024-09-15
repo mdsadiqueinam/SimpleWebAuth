@@ -3,8 +3,11 @@ package models
 import Base64URLString
 import COSEAlgorithmIdentifier
 import extensions.decodeToUTF8
+import extensions.encodeToUByteArray
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.cbor.Cbor
 import kotlinx.serialization.json.Json
 import kotlin.properties.Delegates
 
@@ -74,6 +77,34 @@ data class AuthenticatorSelectionCriteria(
     }
 }
 
+@OptIn(ExperimentalUnsignedTypes::class)
+@Serializable
+data class ParsedAuthenticatorData(
+    val rpIdHash: UByteArray,
+    val flagsBuf: UByteArray,
+    val flags: Flags,
+    val counter: Int,
+    val counterBuf: UByteArray,
+    val aaguid: UByteArray? = null,
+    val credentialID: UByteArray? = null,
+    val credentialPublicKey: UByteArray? = null,
+    val extensionsData: AuthenticationExtensionsAuthenticatorOutputs? = null,
+    val extensionsDataBuffer: UByteArray? = null
+) {
+    @Serializable
+    data class Flags(
+        val up: Boolean,
+        val uv: Boolean,
+        val be: Boolean,
+        val bs: Boolean,
+        val at: Boolean,
+        val ed: Boolean,
+        val flagsInt: Int
+    )
+}
+
+
+@OptIn(ExperimentalUnsignedTypes::class, ExperimentalSerializationApi::class)
 data class AuthenticatorAttestationResponse(
     val clientDataJSON: Base64URLString,
     val attestationObject: Base64URLString,
@@ -118,5 +149,9 @@ data class AuthenticatorAttestationResponse(
     val decodedClientDataJson get(): ClientData {
         val decoded = clientDataJSON.decodeToUTF8()
         return Json.decodeFromString<ClientData>(decoded)
+    }
+
+    val decodedAttestationObject get(): AttestationObject {
+        return Cbor.decodeFromByteArray(AttestationObject.serializer(), attestationObject.encodeToUByteArray().asByteArray())
     }
 }

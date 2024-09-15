@@ -18,14 +18,14 @@ data class TokenBinding(
     val status: Status,
 ) {
     @Serializable
-    enum class Status {
+    enum class Status(val value: String) {
         @SerialName("present")
-        Present,
+        Present("present"),
 
         @SerialName("supported")
-        Supported,
+        Supported("supported"),
 
         @SerialName("not-supported")
-        NotSupported,
+        NotSupported("not-supported"),
     }
 }

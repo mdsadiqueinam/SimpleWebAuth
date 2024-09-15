@@ -11,6 +11,12 @@ enum class CredentialType {
 }
 
 @Serializable
+enum class CredentialDeviceType(val value: String) {
+    @SerialName("singleDevice") SINGLE_DEVICE("singleDevice"),
+    @SerialName("multiDevice") MULTI_DEVICE("multiDevice");
+}
+
+@Serializable
 data class PublicKeyCredentialParameters(
     val alg: COSEAlgorithmIdentifier,
     val type: CredentialType = CredentialType.PUBLIC_KEY,

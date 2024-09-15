@@ -49,4 +49,24 @@ data class VerifyRegistrationResponseOpts(
     }
 }
 
-fun verifyRegistrationResponse(options: GenerateRegistrationOptionsOpts) {}
+fun verifyRegistrationResponse(options: VerifyRegistrationResponseOpts) {
+    val clientDataJson = options.response.response.decodedClientDataJson
+
+    if (options.expectedType.isNotEmpty()) {
+        require(options.expectedType.contains(clientDataJson.type)) {
+            val joined = options.expectedType.joinToString(separator = ", ")
+            "Unexpected registration response type: ${clientDataJson.type}, expected one of : $joined"
+        }
+    } else {
+        require(clientDataJson.type == "webauthn.create") { "Unexpected registration response type: ${clientDataJson.type}" }
+    }
+
+    require(options.expectedChallenge == clientDataJson.challenge) {
+        "Unexpected registration response challenge: ${clientDataJson.challenge}, expected: ${options.expectedChallenge}"
+    }
+
+    require(options.expectedOrigin.contains(clientDataJson.origin)) {
+        val joined = options.expectedOrigin.joinToString(separator = ", ")
+        "Unexpected registration response origin: ${clientDataJson.origin}, expected one: $joined"
+    }
+}
